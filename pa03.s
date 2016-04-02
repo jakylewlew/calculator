@@ -245,22 +245,23 @@ isNegate:
 @ assumes r0 the address of the first byte of string
 @ returns with r0 == 1 if it was a valid operation ('+', '-', '*', '/'), else 0
 isOperation:
-	mov r2,#1
-	cmp r0,#'*'	@multiply
-	moveq r2,#0
-	cmp r0,#'+'	@plus
-	moveq r2,#0
-	cmp r0,#'-' 	@minus
-	moveq r2, #0
-	cmp r0,#'/'	@divide
-	moveq r2,#0
-			@if not any it will be false
+	ldrb r2,[r0,#0]
+	mov r3,#0
+	cmp r2,#'*'	@multiply
+	moveq r3,#1
+	cmp r2,#'+'	@plus
+	moveq r3,#1
+	cmp r2,#'-' 	@minus
+	moveq r3, #1
+	cmp r2,#'/'	@divide
+	moveq r3,#1
+	mov r0,r3	@if not any it will be false
 	bx lr
 
 @ assumes r0 the address of first byte of string
 @ returns with r0 == 1 if it was a number (e.g., in ascii), else 0
 isNumber:
-	
+		
 	cmp r0,#48
 	movlt r0,#0
 	movlt pc,lr
