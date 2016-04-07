@@ -237,7 +237,8 @@ ei_end:	pop	{ r0-r8, lr }		@ restore r0-r8, lr
 @ assumes r0 the address of the first byte of string
 @ returns with r0 == 1 if it was the negate operation ('-'), else 0
 isNegate:
-	cmp r0,#45 @ compare if eq 45 ascii return 1,!n return#0
+	ldrb r8,[r0]
+	cmp r8,#'-' @ compare if eq 45 ascii return 1,!n return#0
 	moveq r0,#1
 	movne r0,#0
 	bx lr
@@ -308,6 +309,7 @@ executeMultiply:
 executeDivide:
 @ executed on unary (one input) '-' operation
 executeNegate:
+	
 	b div
 	bx lr
 
@@ -318,6 +320,10 @@ executeNegate:
 @ called on undefined input
 @ should print appropriate error message
 handleUndefined:
+	push{r0-r8}
+	ldr r1, =string_undefined
+	bl print_string
+	pop{r0-r8}
 	bx lr
 	
 @ called on overflow
@@ -325,11 +331,14 @@ handleUndefined:
 @ for example, you might use: bvc (branch if overflow clear) and bvs (branch if overflow set) or the corresponding branch with link (blvc or blvs)
 @ should print appropriate error message
 handleOverflow:
+	ldr r1, =string_overflow
+	bl print_string
 	bx lr
 	
 @ called on division by zero
 @ should print appropriate error message
 handleDivByZero:
+	ldr r1, =string_div_by_zero
 	bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
