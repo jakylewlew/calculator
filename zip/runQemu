@@ -1,0 +1,8 @@
+# start qemu
+qemu-system-arm -S -s -M versatilepb -daemonize -m 128M -d in_asm,cpu,exec -kernel pa03.bin
+# start gdb using pa03.gdb as init file
+# has breakpoints disabled in case that gets annoying
+#gdb-multiarch --init-command pa03.gdb
+# altenatively, start gdb with pa03_break.gdb as init file
+# check out breakpoints, etc. defined in pa03_break.gdb
+gdb-multiarch --init-command pa03_break.gdb

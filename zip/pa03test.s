@@ -237,78 +237,38 @@ ei_end:	pop	{ r0-r8, lr }		@ restore r0-r8, lr
 @ assumes r0 the address of the first byte of string
 @ returns with r0 == 1 if it was the negate operation ('-'), else 0
 isNegate:
-	cmp r0,#45 @ compare if eq 45 ascii return 1,!n return#0
-	moveq r0,#1
-	movne r0,#0
 	bx lr
-	
+
 @ assumes r0 the address of the first byte of string
 @ returns with r0 == 1 if it was a valid operation ('+', '-', '*', '/'), else 0
 isOperation:
-
-	ldrb r8,[r0,#0]
-	mov r3,#0
-	cmp r8,#'*'	@multiply
-	moveq r3,#1
-	cmp r8,#'+'	@plus
-	moveq r3,#1
-	cmp r8,#'-' 	@minus
-	moveq r3, #1
-	cmp r8,#'/'	@divide
-	moveq r3,#1
-	mov r0,r3	@if not any it will be false
 	bx lr
 
-
-
+@ assumes r0 the address of first byte of string
 @ returns with r0 == 1 if it was a number (e.g., in ascii), else 0
 isNumber:
-
- 	mov r7,#0
-loop:	
-	ldrb r8,[r0,r7]
-	cmp r8,#0
-	moveq r0, #1
-	moveq pc,lr
-	cmp r8,#48
-	blt exitloop
-	cmp r8,#57
-	bgt exitloop
-	add r7,r7,#4
-	b loop
-
-exitloop:
-	mov r0,#0
 	bx lr
-
 
 @ write execution procedures next
 @ each of these get executed respectively on different input operations
 @ executed on binary '+' operation
 executeAdd:
-	adds r0,r0,r1
-	bvs handleOverflow
 	bx lr
-	
 	
 @ executed on binary '-' operation
 executeSubtract:
-	subs r0,r0,r1
-	bvs handleOverflow
 	bx lr
 	
 @ executed on binary '*' operation
 executeMultiply:
-	muls r2,r0,r1
-	bvs handleOverflow
-	mov r0,r2
 	bx lr
 	
 @ executed on binary '/' operation (hint, use div function below)
 executeDivide:
+	bx lr
+	
 @ executed on unary (one input) '-' operation
 executeNegate:
-	b div
 	bx lr
 
 
