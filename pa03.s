@@ -239,6 +239,7 @@ ei_end:	pop	{ r0-r8, lr }		@ restore r0-r8, lr
 isNegate:
 	ldrb r8,[r0]
 	cmp r8,#'-' @ compare if eq 45 ascii return 1,!n return#0
+	beq executeNegate	
 	moveq r0,#1
 	movne r0,#0
 	bx lr
@@ -282,7 +283,6 @@ exitloop:
 	mov r0,#0
 	bx lr
 
-
 @ write execution procedures next
 @ each of these get executed respectively on different input operations
 @ executed on binary '+' operation
@@ -308,26 +308,26 @@ executeMultiply:
 	
 @ executed on binary '/' operation (hint, use div function below)
 executeDivide:
-	
+	cmp r1, #0
+	beq handleDivByZero
 	b div
 	bx lr
-
 
 @ write error handling procedures next
 @ NOTE: you'll want to use the stack here, since these handlers may be called from other functions (e.g., handleDivByZero will be called by executeDivide)
 executeNegate:
-	
+	mul r0,r0,#-1
+	bx lr	
 	
 
 @ undefined input
 @ should print appropriate error message
 handleUndefined:
-	
-	push {r1,lr}
-	mov sp, #0x12000
-	ldr r1, =string_undefined
+	str lr, [sp]
+	ldr r0, =ADDR_UART0
+	ldr r1, =string_undefined	
 	bl print_string
-	pop {r1,lr}
+	ldr lr, [sp]
 	bx lr
 	
 @ called on overflow
@@ -343,7 +343,11 @@ handleOverflow:
 @ called on division by zero
 @ should print appropriate error message
 handleDivByZero:
+	str lr, [sp]
+	ldr r0, =ADDR_UART0
 	ldr r1, =string_div_by_zero
+	bl print_string
+	ldr lr, [sp]
 	bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
