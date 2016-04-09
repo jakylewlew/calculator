@@ -300,15 +300,14 @@ executeSubtract:
 	
 @ executed on binary '*' operation
 executeMultiply:
-	muls r2,r0,r1
-	bvs handleOverflow
+	smull r2,r8,r0,r1
+	cmp r8,#0
+	blne handleOverflow
 	mov r0,r2
 	bx lr
 	
 @ executed on binary '/' operation (hint, use div function below)
 executeDivide:
-@ executed on unary (one input) '-' operation
-executeNegate:
 	
 	b div
 	bx lr
@@ -316,24 +315,30 @@ executeNegate:
 
 @ write error handling procedures next
 @ NOTE: you'll want to use the stack here, since these handlers may be called from other functions (e.g., handleDivByZero will be called by executeDivide)
+executeNegate:
+	
+	
 
-@ called on undefined input
+@ undefined input
 @ should print appropriate error message
 handleUndefined:
-	push{r0-r8}
+	
+	push {r1,lr}
+	mov sp, #0x12000
 	ldr r1, =string_undefined
 	bl print_string
-	pop{r0-r8}
+	pop {r1,lr}
 	bx lr
 	
 @ called on overflow
 @ hint: detect overflow using the 'vc' condition flag
-@ for example, you might use: bvc (branch if overflow clear) and bvs (branch if overflow set) or the corresponding branch with link (blvc or blvs)
+@ for example, you might u:se: bvc (branch if overflow clear) and bvs (branch if overflow set) or the corresponding branch with link (blvc or blvs)
 @ should print appropriate error message
 handleOverflow:
+	ldr r0, =ADDR_UART0
 	ldr r1, =string_overflow
 	bl print_string
-	bx lr
+	bx lr	
 	
 @ called on division by zero
 @ should print appropriate error message
