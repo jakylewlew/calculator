@@ -316,7 +316,10 @@ executeDivide:
 @ write error handling procedures next
 @ NOTE: you'll want to use the stack here, since these handlers may be called from other functions (e.g., handleDivByZero will be called by executeDivide)
 executeNegate:
-	mul r0,r0,#-1
+	ldrb r8, [r0]
+	cmp r8,#'-'
+	moveq r0,#1
+	movne r0,#0
 	bx lr	
 	
 
@@ -335,9 +338,11 @@ handleUndefined:
 @ for example, you might u:se: bvc (branch if overflow clear) and bvs (branch if overflow set) or the corresponding branch with link (blvc or blvs)
 @ should print appropriate error message
 handleOverflow:
+	str lr,[sp]
 	ldr r0, =ADDR_UART0
 	ldr r1, =string_overflow
 	bl print_string
+	ldr lr,[sp]
 	bx lr	
 	
 @ called on division by zero
